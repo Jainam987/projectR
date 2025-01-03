@@ -1,0 +1,247 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  email String @unique
+  phone Int    @unique
+  // password String
+
+  is_active         Boolean @default(true)
+  is_phone_verified Boolean @default(false)
+  is_email_verified Boolean @default(false)
+
+  role_id    String? @db.ObjectId
+  role_code  String?
+  company_id String? @db.ObjectId
+
+  createdBy String? @db.ObjectId
+  updatedBy String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Password {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  password  String
+  is_active Boolean @default(true)
+  version   Int     @default(1)
+
+  user_id String @db.ObjectId
+
+  createdBy String? @db.ObjectId
+  updatedBy String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("passwords")
+}
+
+model RolesMetadata {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  code        String  @unique
+  name        String
+  description String?
+  is_active   Boolean @default(true)
+
+  createdBy String? @db.ObjectId
+  updatedBy String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("rolesMetadata")
+}
+
+model Company {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  is_active   Boolean @default(true)
+
+  createdBy String? @db.ObjectId
+  updatedBy String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("companies")
+}
+
+model ServicesMetadata {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  is_active   Boolean @default(true)
+
+  createdBy String? @db.ObjectId
+  updatedBy String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("servicesMetadata")
+}
+
+model IntervalsMetadata {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  interval_time Int // in seconds
+  description   String?
+  is_active     Boolean @default(true)
+
+  createdBy String? @db.ObjectId
+  updatedBy String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("intervalsMetadata")
+}
+
+model NotificationMethodMetadata {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  is_active   Boolean @default(true)
+
+  createdBy String? @db.ObjectId
+  updatedBy String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("notificationMethodsMetadata")
+}
+
+model SnoozeMetadata {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  snooze_time Int // in seconds
+  description String?
+  is_active   Boolean @default(true)
+
+  createdBy String? @db.ObjectId
+  updatedBy String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("snoozeMetadata")
+}
+
+model userService {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  is_active         Boolean @default(true)
+  snooze            Int[]
+  is_error          Boolean @default(false)
+  is_resolved       Boolean @default(false)
+  is_in_maintenance Boolean @default(false)
+
+  service_id             String   @db.ObjectId
+  user_id                String   @db.ObjectId
+  interval_id            String   @db.ObjectId
+  notification_method_id String[] @db.ObjectId
+
+  createdBy String? @db.ObjectId
+  updatedBy String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("userServices")
+}
+
+model userServiceHistory {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  is_active   Boolean @default(true)
+  snooze      Int[]
+  is_error    Boolean @default(false)
+  is_resolved Boolean @default(false)
+
+  service_id             String   @db.ObjectId
+  user_id                String   @db.ObjectId
+  interval_id            String   @db.ObjectId
+  notification_method_id String[] @db.ObjectId
+
+  createdBy String? @db.ObjectId
+  updatedBy String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("userServiceHistory")
+}
+
+model RequestCallHistory {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  request_time  DateTime
+  request       Json
+  response_time DateTime
+  response      Json
+
+  is_error    Boolean @default(false)
+  is_resolved Boolean @default(false)
+
+  service_id                    String @db.ObjectId
+  interval_id                   String @db.ObjectId
+  interval_time                 Int
+  request_call_error_history_id String @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("requestCallHistory")
+}
+
+model RequestCallErrorHistory {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  is_accepted Boolean @default(false)
+  is_resolved Boolean @default(false)
+
+  snooze               Int[]
+  previous_snooze_time DateTime?
+  next_snooze_time     DateTime?
+
+  service_id              String   @db.ObjectId
+  request_call_history_id String   @db.ObjectId
+  notification_method_id  String[] @db.ObjectId
+  notification_history_id String[] @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("requestCallErrorHistory")
+}
+
+model NotificationHistory {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  sent_time DateTime
+  response  Json
+
+  user_service_id               String @db.ObjectId
+  notification_method_id        String @db.ObjectId
+  request_call_error_history_id String @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("notificationHistory")
+}
