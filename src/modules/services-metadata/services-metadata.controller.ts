@@ -1,34 +1,79 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ServicesMetadataService } from './services-metadata.service';
-import { CreateServicesMetadatumDto } from './dto/create-services-metadatum.dto';
-import { UpdateServicesMetadatumDto } from './dto/update-services-metadatum.dto';
+import {
+  CreateServicesMetadatumDto,
+  DeleteServicesMetadatumResponse,
+  FindAllServicesMetadatumResponse,
+  ServicesMetadatumResponse,
+  UpdateServicesMetadatumDto,
+} from './dto/services-metadatum.dto';
 
 @Controller('services-metadata')
 export class ServicesMetadataController {
   constructor(private readonly servicesMetadataService: ServicesMetadataService) {}
 
   @Post()
-  create(@Body() createServicesMetadatumDto: CreateServicesMetadatumDto) {
-    return this.servicesMetadataService.create(createServicesMetadatumDto);
+  async create(
+    @Body() createServicesMetadatumDto: CreateServicesMetadatumDto,
+  ): Promise<ServicesMetadatumResponse> {
+    const servicesMetadata = await this.servicesMetadataService.create(
+      createServicesMetadatumDto,
+    );
+    return {
+      message: 'Services metadata created successfully',
+      data: servicesMetadata,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.servicesMetadataService.findAll();
+  async findAll(): Promise<FindAllServicesMetadatumResponse> {
+    const servicesMetadata = await this.servicesMetadataService.findAll();
+    return {
+      message: 'Services metadata found successfully',
+      data: servicesMetadata,
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.servicesMetadataService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<ServicesMetadatumResponse> {
+    const servicesMetadata = await this.servicesMetadataService.findOne(id);
+    return {
+      message: 'Services metadata found successfully',
+      data: servicesMetadata,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateServicesMetadatumDto: UpdateServicesMetadatumDto) {
-    return this.servicesMetadataService.update(+id, updateServicesMetadatumDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateServicesMetadatumDto: UpdateServicesMetadatumDto,
+  ): Promise<ServicesMetadatumResponse> {
+    const servicesMetadata = await this.servicesMetadataService.update(
+      id,
+      updateServicesMetadatumDto,
+    );
+    return {
+      message: 'Services metadata updated successfully',
+      data: servicesMetadata,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.servicesMetadataService.remove(+id);
+  async remove(@Param('id') id: string): Promise<DeleteServicesMetadatumResponse> {
+    const servicesMetadata = await this.servicesMetadataService.remove(id);
+    return {
+      message: servicesMetadata
+        ? 'Services metadata deleted successfully'
+        : 'Services metadata deletion failed',
+      data: servicesMetadata,
+    };
   }
 }
