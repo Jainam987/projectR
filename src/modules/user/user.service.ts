@@ -7,7 +7,7 @@ import {
   VerifyEmailDto,
   VerifyPhoneDto,
 } from './dto/user.dto';
-import * as bcrypt from 'bcrypt';
+import * as argon2 from 'argon2';
 
 const selectObj = {
   id: true,
@@ -49,7 +49,7 @@ export class UserService {
       }
 
       // Hash the password
-      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+      const hashedPassword = await argon2.hash(createUserDto.password);
 
       // Create user
       const user = await this.prisma.user.create({
@@ -223,9 +223,9 @@ export class UserService {
         throw new NotFoundException('Password record not found');
       }
 
-      const isPasswordValid = await bcrypt.compare(
-        changePasswordDto.currentPassword,
+      const isPasswordValid = await argon2.verify(
         passwordRecord.password,
+        changePasswordDto.currentPassword,
       );
 
       if (!isPasswordValid) {
@@ -233,7 +233,7 @@ export class UserService {
       }
 
       // Hash the new password
-      const hashedPassword = await bcrypt.hash(changePasswordDto.newPassword, 10);
+      const hashedPassword = await argon2.hash(changePasswordDto.newPassword);
 
       // Update password
       await this.prisma.password.update({
