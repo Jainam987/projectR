@@ -1,26 +1,79 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRolesMetadatumDto } from './dto/create-roles-metadatum.dto';
-import { UpdateRolesMetadatumDto } from './dto/update-roles-metadatum.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import {
+  CreateRolesMetadatumDto,
+  UpdateRolesMetadatumDto,
+} from './dto/roles-metadatum.dto';
+
+const selectObj = {
+  id: true,
+  name: true,
+  code: true,
+  description: true,
+  createdAt: true,
+  updatedAt: true,
+};
 
 @Injectable()
 export class RolesMetadataService {
-  create(createRolesMetadatumDto: CreateRolesMetadatumDto) {
-    return 'This action adds a new rolesMetadatum';
+  constructor(private prisma: PrismaService) {}
+
+  async create(createRolesMetadatumDto: CreateRolesMetadatumDto) {
+    return this.prisma.rolesMetadata.create({
+      data: {
+        name: createRolesMetadatumDto?.name,
+        code: createRolesMetadatumDto?.code,
+        description: createRolesMetadatumDto?.description,
+      },
+      select: selectObj,
+    });
   }
 
-  findAll() {
-    return `This action returns all rolesMetadata`;
+  async findAll() {
+    return this.prisma.rolesMetadata.findMany({
+      where: {
+        is_active: true,
+      },
+      select: selectObj,
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} rolesMetadatum`;
+  async findOne(id: string) {
+    return this.prisma.rolesMetadata.findUnique({
+      where: { id },
+      select: selectObj,
+    });
   }
 
-  update(id: number, updateRolesMetadatumDto: UpdateRolesMetadatumDto) {
-    return `This action updates a #${id} rolesMetadatum`;
+  async findByCode(code: string) {
+    return this.prisma.rolesMetadata.findUnique({
+      where: { code },
+      select: selectObj,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} rolesMetadatum`;
+  async update(id: string, updateRolesMetadatumDto: UpdateRolesMetadatumDto) {
+    const data = {
+      name: updateRolesMetadatumDto?.name || undefined,
+      code: updateRolesMetadatumDto?.code || undefined,
+      description: updateRolesMetadatumDto?.description || undefined,
+      is_active: updateRolesMetadatumDto?.is_active || undefined,
+      updatedBy: updateRolesMetadatumDto?.updatedBy || undefined,
+      updatedAt: new Date(),
+    };
+    return this.prisma.rolesMetadata.update({
+      where: { id },
+      data,
+      select: selectObj,
+    });
+  }
+
+  async remove(id: string) {
+    const rolesMetadata = this.prisma.rolesMetadata.update({
+      where: { id },
+      data: { is_active: false },
+    });
+
+    return rolesMetadata ? true : false;
   }
 }
