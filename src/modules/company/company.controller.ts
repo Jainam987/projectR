@@ -1,34 +1,72 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CompanyService } from './company.service';
-import { CreateCompanyDto } from './dto/create-company.dto';
-import { UpdateCompanyDto } from './dto/update-company.dto';
+import {
+  CreateCompanyDto,
+  UpdateCompanyDto,
+  CompanyResponse,
+  FindAllCompanyResponse,
+  DeleteCompanyResponse,
+} from './dto/company.dto';
 
 @Controller('company')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
   @Post()
-  create(@Body() createCompanyDto: CreateCompanyDto) {
-    return this.companyService.create(createCompanyDto);
+  async create(
+    @Body() createCompanyDto: CreateCompanyDto,
+  ): Promise<CompanyResponse> {
+    const company = await this.companyService.create(createCompanyDto);
+    return {
+      message: 'Company created successfully',
+      data: company,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.companyService.findAll();
+  async findAll(): Promise<FindAllCompanyResponse> {
+    const companies = await this.companyService.findAll();
+    return {
+      message: 'Companies found successfully',
+      data: companies,
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.companyService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<CompanyResponse> {
+    const company = await this.companyService.findOne(id);
+    return {
+      message: 'Company found successfully',
+      data: company,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
-    return this.companyService.update(+id, updateCompanyDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateCompanyDto: UpdateCompanyDto,
+  ): Promise<CompanyResponse> {
+    const company = await this.companyService.update(id, updateCompanyDto);
+    return {
+      message: 'Company updated successfully',
+      data: company,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.companyService.remove(+id);
+  async remove(@Param('id') id: string): Promise<DeleteCompanyResponse> {
+    const result = await this.companyService.remove(id);
+    return {
+      message: 'Company deleted successfully',
+      data: result,
+    };
   }
 }
