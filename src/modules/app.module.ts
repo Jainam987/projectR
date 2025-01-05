@@ -15,16 +15,32 @@ import { UserServiceHistoryModule } from './user-service-history/user-service-hi
 import { RequestCallHistoryModule } from './request-call-history/request-call-history.module';
 import { RequestCallErrorHistoryModule } from './request-call-error-history/request-call-error-history.module';
 import { NotificationHistoryModule } from './notification-history/notification-history.module';
+import { QueueModule } from './queue/queue.module';
 
 @Module({
-  imports: [UserModule, AuthModule, PrismaModule, PasswordModule, RolesMetadataModule, CompanyModule, ServicesMetadataModule, IntervalsMetadataModule, NotificationMethodsMetadataModule, SnoozeMetadataModule, UserServiceModule, UserServiceHistoryModule, RequestCallHistoryModule, RequestCallErrorHistoryModule, NotificationHistoryModule],
+  imports: [
+    UserModule,
+    AuthModule,
+    PrismaModule,
+    PasswordModule,
+    RolesMetadataModule,
+    CompanyModule,
+    ServicesMetadataModule,
+    IntervalsMetadataModule,
+    NotificationMethodsMetadataModule,
+    SnoozeMetadataModule,
+    UserServiceModule,
+    UserServiceHistoryModule,
+    RequestCallHistoryModule,
+    RequestCallErrorHistoryModule,
+    NotificationHistoryModule,
+    QueueModule,
+  ],
   controllers: [],
   providers: [],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthMiddleware)
-      .forRoutes('*');
+    consumer.apply(AuthMiddleware).forRoutes('*');
   }
 }
