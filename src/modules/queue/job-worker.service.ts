@@ -29,4 +29,8 @@ export class JobWorkerService {
       console.log(`Job ${job.id} failed: ${err.message}`);
     });
   }
+
+  async closeWorker() {
+    await this.worker.close();
+  }
 }

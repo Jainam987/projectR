@@ -38,10 +38,10 @@ model User {
 
 model Password {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  password  String 
-  is_active Boolean @default(true) 
+  password  String
+  is_active Boolean @default(true)
 
-  user_id String @db.ObjectId @unique
+  user_id String @unique @db.ObjectId
 
   createdBy String? @db.ObjectId
   updatedBy String? @db.ObjectId
@@ -170,9 +170,13 @@ model userService {
   is_resolved       Boolean @default(false)
   is_in_maintenance Boolean @default(false)
 
+  queue_job_id         String
+  queue_repeat_job_key String?
+
   service_id             String   @db.ObjectId
   user_id                String   @db.ObjectId
   interval_id            String   @db.ObjectId
+  interval_time          Int
   notification_method_id String[] @db.ObjectId
 
   createdBy String? @db.ObjectId
@@ -191,9 +195,13 @@ model userServiceHistory {
   is_error    Boolean @default(false)
   is_resolved Boolean @default(false)
 
+  queue_job_id String?
+  queue_repeat_job_key String?
+
   service_id             String   @db.ObjectId
   user_id                String   @db.ObjectId
   interval_id            String   @db.ObjectId
+  interval_time          Int
   notification_method_id String[] @db.ObjectId
 
   createdBy String? @db.ObjectId

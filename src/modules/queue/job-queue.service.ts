@@ -1,6 +1,7 @@
 // job-queue.service.ts
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
+import { ModifyJob } from './dto';
 
 @Injectable()
 export class JobQueueService {
@@ -33,5 +34,41 @@ export class JobQueueService {
   async resumeQueue() {
     const queueObj = await this.queue.resume();
     console.log(`Queue resumed: ${JSON.stringify(queueObj, null, 2)}`);
+  }
+
+  async modifyJob({ jobName, data, interval, repeatJobKey }: ModifyJob) {
+    console.log(`Modify job: ${jobName}`);
+
+    await this.queue.removeRepeatableByKey(repeatJobKey);
+
+    const queueObj = await this.queue.add(jobName, data, {
+      repeat: { every: interval }, // Interval in milliseconds (e.g., 60000 for 60 seconds)
+      removeOnComplete: true, // Automatically remove completed jobs
+    });
+    console.log(`Job modified: ${JSON.stringify(queueObj, null, 2)}`);
+  }
+
+  async cleanJobs(type: any) {
+    const queueObj = await this.queue.clean(0, 1000, type);
+    console.log(`Completed jobs cleaned: ${JSON.stringify(queueObj, null, 2)}`);
+  }
+
+  async drainQueue() {
+    const queueObj = await this.queue.drain();
+    console.log(`Queue emptied: ${JSON.stringify(queueObj, null, 2)}`);
+  }
+
+  async removeRepeatableByKey(repeatJobKey: string) {
+    const queueObj = await this.queue.removeRepeatableByKey(repeatJobKey);
+    console.log(`Repeatable job removed: ${JSON.stringify(queueObj, null, 2)}`);
+  }
+
+  async monitorJob() {
+    return {
+      waitingCount: await this.queue.getWaitingCount(),
+      activeCount: await this.queue.getActiveCount(),
+      completedCount: await this.queue.getCompletedCount(),
+      failedCount: await this.queue.getFailedCount(),
+    };
   }
 }
