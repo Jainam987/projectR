@@ -45,14 +45,14 @@ export class RequestCallHistoryService {
         throw new NotFoundException('Interval not found');
       }
 
-      // Check if request call error history exists
-      const errorHistory = await this.prisma.requestCallErrorHistory.findUnique({
-        where: { id: createRequestCallHistoryDto.request_call_error_history_id },
-      });
+      // // Check if request call error history exists
+      // const errorHistory = await this.prisma.requestCallErrorHistory.findUnique({
+      //   where: { id: createRequestCallHistoryDto.request_call_error_history_id },
+      // });
 
-      if (!errorHistory) {
-        throw new NotFoundException('Request call error history not found');
-      }
+      // if (!errorHistory) {
+      //   throw new NotFoundException('Request call error history not found');
+      // }
 
       return await this.prisma.requestCallHistory.create({
         data: {
@@ -65,7 +65,7 @@ export class RequestCallHistoryService {
           service_id: createRequestCallHistoryDto.service_id,
           interval_id: createRequestCallHistoryDto.interval_id,
           interval_time: createRequestCallHistoryDto.interval_time,
-          request_call_error_history_id: createRequestCallHistoryDto.request_call_error_history_id,
+          // request_call_error_history_id: createRequestCallHistoryDto.request_call_error_history_id,
         },
         select: selectObj,
       });

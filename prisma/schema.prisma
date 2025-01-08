@@ -103,6 +103,7 @@ model Company {
 model ServicesMetadata {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
+  code        String
   description String?
   is_active   Boolean @default(true)
 
@@ -163,21 +164,42 @@ model SnoozeMetadata {
 }
 
 model userService {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  is_active         Boolean @default(true)
-  snooze            Int[]
-  is_error          Boolean @default(false)
-  is_resolved       Boolean @default(false)
-  is_in_maintenance Boolean @default(false)
+  id                   String  @id @default(auto()) @map("_id") @db.ObjectId
+  name                 String?
+  URL                  String?
+  keywords             String?
+  retries              Int?
+  request_timeout      Int? // in sec
+  req_method           String?
+  req_headers          Json?
+  req_body_encoding    Json?
+  req_body             Json?
+  authentication       Json?
+  response_body        Json?
+  accepted_status_code Int?
+  is_single_time_alert Boolean @default(false)
 
   queue_job_id         String
   queue_repeat_job_key String?
 
+  snooze               Int[]
+  current_snooze_point Int?
+  previous_snooze_time DateTime?
+  next_snooze_time     DateTime?
+
+  is_active         Boolean @default(true)
+  is_error          Boolean @default(false)
+  is_resolved       Boolean @default(false)
+  is_in_maintenance Boolean @default(false)
+
   service_id             String   @db.ObjectId
+  service_code           String
   user_id                String   @db.ObjectId
   interval_id            String   @db.ObjectId
   interval_time          Int
   notification_method_id String[] @db.ObjectId
+  retries_interval_id    String?  @db.ObjectId
+  retries_interval_time  Int?
 
   createdBy String? @db.ObjectId
   updatedBy String? @db.ObjectId
@@ -194,9 +216,6 @@ model userServiceHistory {
   snooze      Int[]
   is_error    Boolean @default(false)
   is_resolved Boolean @default(false)
-
-  queue_job_id String?
-  queue_repeat_job_key String?
 
   service_id             String   @db.ObjectId
   user_id                String   @db.ObjectId
@@ -223,10 +242,10 @@ model RequestCallHistory {
   is_error    Boolean @default(false)
   is_resolved Boolean @default(false)
 
-  service_id                    String @db.ObjectId
-  interval_id                   String @db.ObjectId
+  service_id                    String  @db.ObjectId
+  interval_id                   String  @db.ObjectId
   interval_time                 Int
-  request_call_error_history_id String @db.ObjectId
+  request_call_error_history_id String? @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -239,10 +258,11 @@ model RequestCallErrorHistory {
   is_accepted Boolean @default(false)
   is_resolved Boolean @default(false)
 
-  snooze               Int[]
-  previous_snooze_time DateTime?
-  next_snooze_time     DateTime?
+  error_started_time DateTime?
+  error_ended_time   DateTime?
+  accepted_time      DateTime?
 
+  snooze                  Int[]
   service_id              String   @db.ObjectId
   request_call_history_id String   @db.ObjectId
   notification_method_id  String[] @db.ObjectId

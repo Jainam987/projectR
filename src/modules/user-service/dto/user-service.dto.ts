@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsBoolean, IsArray, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsBoolean, IsArray, IsNumber, IsDate } from 'class-validator';
 
 export class CreateUserServiceDto {
   @IsString()
@@ -42,6 +42,10 @@ export class CreateUserServiceDto {
   @IsString()
   @IsOptional()
   updatedBy?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  is_single_time_alert?: boolean;
 }
 
 export class UpdateUserServiceDto {
@@ -86,6 +90,22 @@ export class UpdateUserServiceDto {
   @IsString()
   @IsOptional()
   updatedBy?: string;
+
+  @IsDate()
+  @IsOptional()
+  previous_snooze_time?: Date;
+
+  @IsDate()
+  @IsOptional()
+  next_snooze_time?: Date;
+
+  @IsNumber()
+  @IsOptional()
+  current_snooze_point?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  is_single_time_alert?: boolean;
 }
 
 export class UserServiceDataResponse {
@@ -101,7 +121,29 @@ export class UserServiceDataResponse {
   is_in_maintenance: boolean;
   createdAt: Date;
   updatedAt: Date;
-}
+  name: string;
+  URL: string;
+  keywords: string;
+  retries: number;
+  request_timeout: number;
+  req_method: string;
+  req_body: Object;
+  req_headers: Object;
+  req_body_encoding: string;
+  authentication: Object;
+  response_body: Object;
+  accepted_status_code: number;
+  queue_job_id: string;
+  queue_repeat_job_key: string;
+  service_code: string;
+  interval_time: number;
+  retries_interval_id: string;
+  retries_interval_time: number;
+  previous_snooze_time: Date;
+  next_snooze_time: Date;
+  current_snooze_point: number;
+  is_single_time_alert: boolean;
+} 
 
 export class UserServiceResponse {
   message: string;

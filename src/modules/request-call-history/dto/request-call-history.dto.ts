@@ -34,7 +34,8 @@ export class CreateRequestCallHistoryDto {
   interval_time: number;
 
   @IsString()
-  request_call_error_history_id: string;
+  @IsOptional()
+  request_call_error_history_id?: string;
 }
 
 export class UpdateRequestCallHistoryDto {

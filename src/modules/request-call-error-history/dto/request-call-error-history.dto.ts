@@ -35,6 +35,18 @@ export class CreateRequestCallErrorHistoryDto {
   @IsArray()
   @IsString({ each: true })
   notification_history_id: string[];
+
+  @IsDate()
+  @IsOptional()
+  error_started_time?: Date;
+
+  @IsDate()
+  @IsOptional()
+  error_ended_time?: Date;
+
+  @IsDate()
+  @IsOptional()
+  accepted_time?: Date;
 }
 
 export class UpdateRequestCallErrorHistoryDto {
@@ -91,6 +103,9 @@ export class RequestCallErrorHistoryDataResponse {
   notification_history_id: string[];
   createdAt: Date;
   updatedAt: Date;
+  error_started_time?: Date;
+  error_ended_time?: Date;
+  accepted_time?: Date;
 }
 
 export class RequestCallErrorHistoryResponse {
