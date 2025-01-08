@@ -192,14 +192,15 @@ model userService {
   is_resolved       Boolean @default(false)
   is_in_maintenance Boolean @default(false)
 
-  service_id             String   @db.ObjectId
-  service_code           String
-  user_id                String   @db.ObjectId
-  interval_id            String   @db.ObjectId
-  interval_time          Int
-  notification_method_id String[] @db.ObjectId
-  retries_interval_id    String?  @db.ObjectId
-  retries_interval_time  Int?
+  service_id                    String   @db.ObjectId
+  service_code                  String
+  user_id                       String   @db.ObjectId
+  interval_id                   String   @db.ObjectId
+  interval_time                 Int
+  notification_method_id        String[] @db.ObjectId
+  retries_interval_id           String?  @db.ObjectId
+  retries_interval_time         Int?
+  request_call_error_history_id String?  @db.ObjectId
 
   createdBy String? @db.ObjectId
   updatedBy String? @db.ObjectId
@@ -242,10 +243,9 @@ model RequestCallHistory {
   is_error    Boolean @default(false)
   is_resolved Boolean @default(false)
 
-  service_id                    String  @db.ObjectId
-  interval_id                   String  @db.ObjectId
-  interval_time                 Int
-  request_call_error_history_id String? @db.ObjectId
+  service_id    String @db.ObjectId
+  interval_id   String @db.ObjectId
+  interval_time Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -264,7 +264,7 @@ model RequestCallErrorHistory {
 
   snooze                  Int[]
   service_id              String   @db.ObjectId
-  request_call_history_id String   @db.ObjectId
+  request_call_history_id String?   @db.ObjectId
   notification_method_id  String[] @db.ObjectId
   notification_history_id String[] @db.ObjectId
 

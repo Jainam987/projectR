@@ -46,6 +46,10 @@ export class CreateUserServiceDto {
   @IsBoolean()
   @IsOptional()
   is_single_time_alert?: boolean;
+
+  @IsString()
+  @IsOptional()
+  request_call_error_history_id?: string | null;
 }
 
 export class UpdateUserServiceDto {
@@ -106,6 +110,10 @@ export class UpdateUserServiceDto {
   @IsBoolean()
   @IsOptional()
   is_single_time_alert?: boolean;
+
+  @IsString()
+  @IsOptional()
+  request_call_error_history_id?: string | null;
 }
 
 export class UserServiceDataResponse {
@@ -143,6 +151,7 @@ export class UserServiceDataResponse {
   next_snooze_time: Date;
   current_snooze_point: number;
   is_single_time_alert: boolean;
+  request_call_error_history_id: string | null;
 } 
 
 export class UserServiceResponse {

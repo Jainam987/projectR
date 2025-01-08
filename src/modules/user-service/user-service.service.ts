@@ -43,6 +43,7 @@ const selectObj = {
   previous_snooze_time: true,
   next_snooze_time: true,
   is_single_time_alert: true,
+  request_call_error_history_id: true,
 };
 
 @Injectable()

@@ -8,7 +8,6 @@ import { url } from 'inspector';
 import { RequestCallHistoryService } from 'src/modules/request-call-history/request-call-history.service';
 import { RequestCallErrorHistoryService } from 'src/modules/request-call-error-history/request-call-error-history.service';
 
-
 export async function schedulerFunction(userServiceId: string) {
   class schedulerFunctionUtil {
     constructor(
@@ -57,52 +56,56 @@ export async function schedulerFunction(userServiceId: string) {
 
         console.log('Response Data: ', responseData);
 
-        // modify requestCallHistory create object for the error
-        const requestCallHistory = await this.requestCallHistoryService.create({
+        let createRequestCallHistoryObject = {
           request: reqBody,
           response: responseData,
           service_id: userService.service_id,
           request_time: requestTime,
           response_time: new Date(),
-          is_error: false,
-          is_resolved: true,
+          is_error: !responseData && !userService?.is_error ? true : false,
+          is_resolved: !responseData && !userService?.is_error ? false : true,
           interval_id: userService.interval_id,
           interval_time: userService.interval_time,
-        });
+        };
+
+        const requestCallHistory = await this.requestCallHistoryService.create(
+          createRequestCallHistoryObject,
+        );
 
         console.log('Request Call History: ', requestCallHistory);
 
+        // Send notification if snooze is complete
         if (
           !responseData &&
           userService?.is_error &&
           userService?.next_snooze_time < new Date() &&
           !userService?.is_single_time_alert
         ) {
-          let snoozePoint
-          let updatedCurrentSnoozePoint
+          let snoozePoint;
+          let updatedCurrentSnoozePoint;
           const nextSnoozePoint = userService?.current_snooze_point + 1;
           if (nextSnoozePoint < snooze.length) {
-            snoozePoint = snooze.length - 1
-            updatedCurrentSnoozePoint = nextSnoozePoint
+            snoozePoint = snooze.length - 1;
+            updatedCurrentSnoozePoint = nextSnoozePoint;
           } else {
-            snoozePoint = nextSnoozePoint
-            updatedCurrentSnoozePoint = nextSnoozePoint
+            snoozePoint = nextSnoozePoint;
+            updatedCurrentSnoozePoint = nextSnoozePoint;
           }
 
           // update the next_snooze_time userServiceService
           const updatedErrorUserService = await this.userServiceService.update(
             userServiceId,
             {
-              next_snooze_time:
-                userService?.is_single_time_alert
-                  ? null
-                  : new Date() + snooze[snoozePoint] * 1000,
-              current_snooze_point: updatedCurrentSnoozePoint
+              next_snooze_time: userService?.is_single_time_alert
+                ? null
+                : new Date() + snooze[snoozePoint] * 1000,
+              current_snooze_point: updatedCurrentSnoozePoint,
             },
           );
           // send notification
         }
 
+        // Error solved
         if (responseData && userService?.is_error) {
           const updatedResolveUserService =
             await this.userServiceService.update(userServiceId, {
@@ -112,9 +115,31 @@ export async function schedulerFunction(userServiceId: string) {
               next_snooze_time: null,
               current_snooze_point: 0,
             });
+
+          const requestCallErrorHistory =
+            await this.requestCallErrorHistoryService.update(
+              userService.request_call_error_history_id,
+              {
+                error_ended_time: new Date(),
+                is_resolved: true,
+              },
+            );
         }
 
+        // register error
         if (!responseData && !userService?.is_error) {
+          // create requestCallErrorHistoryService
+          const requestCallErrorHistory =
+            await this.requestCallErrorHistoryService.create({
+              error_started_time: new Date(),
+              snooze: userService.snooze,
+              service_id: userService.service_id,
+              request_call_history_id: requestCallHistory.id,
+              notification_method_id: userService.notification_method_id,
+              notification_history_id: [],
+            });
+
+          // add request_call_error_history_id in the user service
           const updatedErrorUserService = await this.userServiceService.update(
             userServiceId,
             {
@@ -125,19 +150,9 @@ export async function schedulerFunction(userServiceId: string) {
                 snooze.length && !userService?.is_single_time_alert
                   ? new Date() + snooze[0] * 1000
                   : null,
+              request_call_error_history_id: requestCallErrorHistory.id,
             },
           );
-
-          // create requestCallErrorHistoryService
-          const requestCallErrorHistory = await this.requestCallErrorHistoryService.create({
-            error_started_time: new Date(),
-            snooze: userService.snooze,
-            service_id: userService.service_id,
-            request_call_history_id: requestCallHistory.id,
-            notification_method_id: userService.notification_method_id,
-            notification_history_id: [],
-          });
-
           // send notification
         }
       } catch (error) {
