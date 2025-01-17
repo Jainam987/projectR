@@ -103,7 +103,7 @@ model Company {
 model ServicesMetadata {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
-  code        String
+  code        String  @unique
   description String?
   is_active   Boolean @default(true)
 
@@ -119,7 +119,8 @@ model ServicesMetadata {
 model IntervalsMetadata {
   id            String  @id @default(auto()) @map("_id") @db.ObjectId
   name          String
-  interval_time Int // in seconds
+  code          String  @unique
+  interval_time Int  // in seconds
   description   String?
   is_active     Boolean @default(true)
 
@@ -135,6 +136,7 @@ model IntervalsMetadata {
 model NotificationMethodMetadata {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
+  code        String  @unique
   description String?
   is_active   Boolean @default(true)
 
@@ -150,6 +152,7 @@ model NotificationMethodMetadata {
 model SnoozeMetadata {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
   name        String
+  code        String  @unique
   snooze_time Int // in seconds
   description String?
   is_active   Boolean @default(true)

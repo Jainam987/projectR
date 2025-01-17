@@ -16,4 +16,24 @@ export class PrismaController {
   role() {
     return this.prismaService.seedRoles();
   }
+
+  @Get('service')
+  service() {
+    return this.prismaService.seedService();
+  }
+
+  @Get('initials')
+  initials() {
+    return this.prismaService.seedInitials();
+  }
+
+  @Get('notification-method')
+  notification() {
+    return this.prismaService.seedNotificationMethod();
+  }
+
+  @Get('snooze')
+  snooze() {
+    return this.prismaService.seedSnooze();
+  }
 }
